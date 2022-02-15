@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动力IT实训-WebGL-006</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="./Misc.js"></script>
+    <script src="./axes.js"></script>
+    <script src="../../libs/puiedu-matrix.js"></script>
+    <script src="./camera.js"></script>
+</head>
+
+<body>
+    <canvas id="puiedu-canvas"></canvas>
+    <script type='module'>
+        import * as shader_6 from './shader_6.glsl.js'
+        import { dat } from '../../libs/dat.gui.js'
+
+        var clrArray = new Float32Array([1.0,1.0,1.0,1.0]);
+
+        var ctrl = new dat.GUI();
+        var backgroundCtrlObj = { backColor: 0xffffff };
+        var backgroundGroup = ctrl.addFolder("background");
+        backgroundGroup.addColor(backgroundCtrlObj, "backColor").onChange(function (value) {
+            draw();
+        })
+
+        var cvs = document.getElementById('puiedu-canvas');
+        cvs.width = window.innerWidth;
+        cvs.height = window.innerHeight;
+
+        const gl = cvs.getContext('webgl');
+        gl.viewport(0, 0, cvs.width, cvs.height);
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        var vshader_src = shader_6.vertex;
+        var vshader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vshader, vshader_src);
+        gl.compileShader(vshader);
+
+        var fshader_src = shader_6.fragment;
+        var fshader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fshader, fshader_src);
+        gl.compileShader(fshader);
+
+        var glProgram = gl.createProgram();
+        gl.attachShader(glProgram, vshader);
+        gl.attachShader(glProgram, fshader);
+
+        gl.linkProgram(glProgram);
+        gl.useProgram(glProgram);
+
+        ////////////////////////////////////////////////////////////////////////
+        var a_Position = gl.getAttribLocation(glProgram, 'a_Position');
+        var a_Color = gl.getAttribLocation(glProgram, 'a_Color');
+        var u_cameraMatrix = gl.getUniformLocation(glProgram,'u_cameraMatrix');
+
+        var axes = new pgl_axes(gl,a_Position, a_Color, 5, 0xff0000, 0x00ff00, 0x0000ff, ctrl);
+        
+        var camera = new pgl_camera(gl,u_cameraMatrix,ctrl,75,cvs.width / cvs.height,1,1000);
+
+        draw();
+
+        function draw() {
+            ColorValueToColorArray(backgroundCtrlObj.backColor,clrArray);
+            gl.clearColor(clrArray[0], clrArray[1],clrArray[2],clrArray[3]);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            camera.draw();
+            axes.draw();            
+        }
+
+        renderScene();
+
+        function renderScene(){
+            draw();
+            requestAnimationFrame(renderScene);
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+
+        window.addEventListener("resize", resizeCanvas);
+        function resizeCanvas() {
+            cvs.width = window.innerWidth;
+            cvs.height = window.innerHeight;
+            gl.viewport(0, 0, cvs.width, cvs.height);
+        }
+
+    </script>
+
+</body>
+
+</html>
