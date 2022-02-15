@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动力IT实训-WebGL-002</title>
+    <style>
+        body{margin: 0;overflow: hidden;}
+    </style>
+    <!-- <script type="x-shader/x_vertex" id='vshader_src'>
+        void main(){
+            gl_Position = vec4(0.0,0.0,0.0,1.0);//设置坐标
+            gl_PointSize = 25.0;//设置点尺寸
+        }
+    </script>
+    <script type="x-shader/x-fragment" id='fshader_src'>
+        void main(){
+            gl_FragColor = vec4(1.0,1.0,0.0,1.0);//设置颜色
+        }
+    </script> -->
+</head>
+<body>
+    <canvas id="puiedu-canvas"></canvas>
+    <script type = 'module'>
+        import * as shader_3 from './shader_3.glsl.js'
+
+        var cvs = document.getElementById('puiedu-canvas');
+        cvs.width = window.innerWidth;
+        cvs.height = window.innerHeight;
+
+        const gl = cvs.getContext('webgl');
+        gl.viewport(0,0,cvs.width,cvs.height);
+        gl.clearColor(0,1.0,1.0,1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        var vshader_src = shader_3.vertex; //document.getElementById('vshader_src').innerHTML;
+        var vshader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vshader,vshader_src);
+        gl.compileShader(vshader);
+
+        var fshader_src = shader_3.fragment;//document.getElementById('fshader_src').innerHTML;
+        var fshader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fshader,fshader_src);
+        gl.compileShader(fshader);
+
+        var glProgram = gl.createProgram();
+        gl.attachShader(glProgram,vshader);
+        gl.attachShader(glProgram,fshader);
+
+        gl.linkProgram(glProgram);
+        gl.useProgram(glProgram);
+
+        gl.drawArrays(gl.POINTS,0,1);
+
+        window.addEventListener("resize",resizeCanvas);
+        function resizeCanvas(){
+            cvs.width = window.innerWidth;
+            cvs.height = window.innerHeight;
+            gl.viewport(0,0,cvs.width,cvs.height);
+        }
+
+    </script>
+    
+</body>
+</html>
